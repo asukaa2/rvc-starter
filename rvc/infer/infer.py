@@ -11,13 +11,13 @@ import soundfile as sf
 warnings.filterwarnings("ignore")
 sys.path.append(os.getcwd())
 
-from rvc.modules.utils import fairseq
+from rvc.modules import fairseq
 from rvc.config import Config
 from rvc.modules.cut import cut, restore
 from rvc.infer.pipeline import Pipeline
-from rvc.modules.my_utils import clear_gpu_cache
+from rvc.infer.utils import clear_gpu_cache
 from rvc.lib.algo.synthesizers import Synthesizer
-from rvc.modules.my_utils import check_predictors, check_embedders, load_audio
+from rvc.infer.utils import check_predictors, check_embedders, load_audio
 
 for l in ["torch", "faiss", "omegaconf", "httpx", "httpcore", "faiss.loader", "numba.core", "urllib3", "transformers", "matplotlib"]:
     logging.getLogger(l).setLevel(logging.ERROR)
