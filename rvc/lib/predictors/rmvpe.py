@@ -10,7 +10,7 @@ from librosa.filters import mel
 
 sys.path.append(os.getcwd())
 
-from rvc.lib import opencl
+from rvc import opencl
 
 N_MELS, N_CLASS = 128, 360
 
