@@ -8,12 +8,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from torch.utils.checkpoint import checkpoint
-from torch.nn.utils import remove_weight_norm
 from torch.nn.utils.parametrizations import weight_norm
 
 sys.path.append(os.getcwd())
 
 from rvc.lib.algo.commons import init_weights, get_padding
+from rvc.lib.algo._weight_norm_compat import remove_weight_norm
 
 
 class ResBlock(nn.Module):
@@ -129,7 +129,7 @@ class RefineGANGenerator(nn.Module):
         self.mel_conv = weight_norm(nn.Conv1d(num_mels, channels // 2, 7, 1, padding=3))
         self.mel_conv.apply(init_weights)
 
-        if gin_channels != 0: self.cond = nn.Conv1d(256, channels // 2, 1)
+        if gin_channels != 0: self.cond = nn.Conv1d(gin_channels, channels // 2, 1)
 
         self.upsample_blocks = nn.ModuleList([])
         self.upsample_conv_blocks = nn.ModuleList([])
@@ -164,7 +164,7 @@ class RefineGANGenerator(nn.Module):
         remove_weight_norm(self.conv_post)
 
         for block in self.downsample_blocks:
-            block.remove_weight_norm()
+            remove_weight_norm(block)
 
         for block in self.upsample_conv_blocks:
             block.remove_weight_norm()

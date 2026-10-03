@@ -5,14 +5,14 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 
-from torch.nn.utils import remove_weight_norm
 from torch.utils.checkpoint import checkpoint
 from torch.nn.utils.parametrizations import weight_norm
 
 sys.path.append(os.getcwd())
 
-from rvc.lib.algo.generators.commons import init_weights
-from rvc.lib.algo.generators.residuals import ResBlock, LRELU_SLOPE
+from rvc.lib.algo.commons import init_weights
+from rvc.lib.algo.residuals import ResBlock, LRELU_SLOPE
+from rvc.lib.algo._weight_norm_compat import remove_weight_norm
 
 class SineGen(torch.nn.Module):
     def __init__(self, samp_rate, harmonic_num=0, sine_amp=0.1, noise_std=0.003, voiced_threshold=0, flag_for_pulse=False):
@@ -31,7 +31,10 @@ class SineGen(torch.nn.Module):
         rad = f0 / self.sampling_rate * torch.arange(1, upp + 1, dtype=f0.dtype, device=f0.device)
         rad += F.pad((torch.fmod(rad[:, :-1, -1:].float() + 0.5, 1.0) - 0.5).cumsum(dim=1).fmod(1.0).to(f0), (0, 0, 1, 0), mode='constant')
         rad = rad.reshape(f0.shape[0], -1, 1)
-        rad *= torch.arange(1, self.dim + 1, dtype=f0.dtype, device=f0.device).reshape(1, 1, -1)
+        # Non-in-place multiply: in-place ``rad *= arange`` only works when
+        # ``harmonic_num == 0``; with ``harmonic_num > 0`` the broadcast
+        # changes the last dim and the in-place op raises a RuntimeError.
+        rad = rad * torch.arange(1, self.dim + 1, dtype=f0.dtype, device=f0.device).reshape(1, 1, -1)
         rand_ini = torch.rand(1, 1, self.dim, device=f0.device)
         rand_ini[..., 0] = 0
         rad += rand_ini

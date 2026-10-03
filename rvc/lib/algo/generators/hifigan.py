@@ -3,13 +3,13 @@ import sys
 import torch
 import torch.nn.functional as F
 
-from torch.nn.utils import remove_weight_norm
 from torch.nn.utils.parametrizations import weight_norm
 
 sys.path.append(os.getcwd())
 
-from rvc.lib.algo.generators.commons import init_weights
-from rvc.lib.algo.generators.residuals import ResBlock, LRELU_SLOPE
+from rvc.lib.algo.commons import init_weights
+from rvc.lib.algo.residuals import ResBlock, LRELU_SLOPE
+from rvc.lib.algo._weight_norm_compat import remove_weight_norm
 
 class HiFiGANGenerator(torch.nn.Module):
     def __init__(self, initial_channel, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, gin_channels=0):
@@ -29,24 +29,24 @@ class HiFiGANGenerator(torch.nn.Module):
         self.ups_and_resblocks.apply(init_weights)
         if gin_channels != 0: self.cond = torch.nn.Conv1d(gin_channels, upsample_initial_channel, 1)
 
-        def forward(self, x, g = None):
-            x = self.conv_pre(x)
-            if g is not None: x = x + self.cond(g)
-            
-            resblock_idx = 0
+    def forward(self, x, g=None):
+        x = self.conv_pre(x)
+        if g is not None: x = x + self.cond(g)
 
-            for _ in range(self.num_upsamples):
-                x = self.ups_and_resblocks[resblock_idx](F.leaky_relu(x, LRELU_SLOPE))
+        resblock_idx = 0
+
+        for _ in range(self.num_upsamples):
+            x = self.ups_and_resblocks[resblock_idx](F.leaky_relu(x, LRELU_SLOPE))
+            resblock_idx += 1
+            xs = 0
+
+            for _ in range(self.num_kernels):
+                xs += self.ups_and_resblocks[resblock_idx](x)
                 resblock_idx += 1
-                xs = 0
 
-                for _ in range(self.num_kernels):
-                    xs += self.ups_and_resblocks[resblock_idx](x)
-                    resblock_idx += 1
+            x = xs / self.num_kernels
 
-                x = xs / self.num_kernels
-
-            return torch.tanh(self.conv_post(F.leaky_relu(x)))
+        return torch.tanh(self.conv_post(F.leaky_relu(x)))
 
     def __prepare_scriptable__(self):
         for l in self.ups_and_resblocks:

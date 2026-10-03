@@ -10,9 +10,9 @@ from scipy import signal
 
 sys.path.append(os.getcwd())
 
-from rvc.lib.predictor.generator import Generator
-from rvc.lib.modules.utils.rms import RMSEnergyExtractor
-from rvc.lib.modules.my_utils import change_rms, clear_gpu_cache
+from rvc.lib.predictors.generator import Generator
+from rvc.modules.utils.rms import RMSEnergyExtractor
+from rvc.infer.utils import change_rms, clear_gpu_cache
 
 bh, ah = signal.butter(N=5, Wn=48, btype="high", fs=16000)
 

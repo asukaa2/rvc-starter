@@ -45,11 +45,14 @@ def infer_main(
     clean_audio=False, 
     clean_strength=0.7
 ):
-    check_predictors(f0_method); check_embedders(embedder_model)
-    
+    # Validate the model path BEFORE downloading pitch extractors / embedders
+    # — otherwise a typo in `--model` triggers multi-hundred-MB downloads that
+    # the user can't use anyway.
     if not pth_path or not os.path.exists(pth_path) or os.path.isdir(pth_path) or not pth_path.endswith(".pth"):
         print("[WARNING] Please enter a valid model.")
         return
+
+    check_predictors(f0_method); check_embedders(embedder_model)
 
     config = Config(is_half=is_half, cpu_mode=cpu_mode)
     cvt = VoiceConverter(config, pth_path, 0)
@@ -224,13 +227,13 @@ class VoiceConverter:
                 self.tgt_sr = resample_sr
 
             if clean_audio:
-                from modules.noisereduce import reduce_noise
+                from rvc.modules.noisereduce import reduce_noise
                 audio_output = reduce_noise(
-                    y=audio_output, 
-                    sr=self.tgt_sr, 
-                    prop_decrease=clean_strength, 
+                    y=audio_output,
+                    sr=self.tgt_sr,
+                    prop_decrease=clean_strength,
                     device=self.device
-                ) 
+                )
 
             sf.write(audio_output_path, audio_output, self.tgt_sr, format=export_format)
         except Exception as e:

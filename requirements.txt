@@ -1,0 +1,29 @@
+# Core deep-learning stack.
+# Pin major versions to the ones the code is tested against; feel free to
+# relax the upper bounds if you know what you are doing.
+torch>=2.1.0
+torchaudio>=2.1.0
+
+# Numerical / audio processing.
+numpy>=1.23
+scipy>=1.10
+librosa>=0.10
+soundfile>=0.12
+numba>=0.57
+praat-parselmouth>=0.4.3   # used by the "pm" f0 method (provides the `parselmouth` import)
+faiss-cpu>=1.7.4     # used by the retrieval index in the pipeline
+
+# Config / typing / model utilities.
+omegaconf>=2.3
+einops>=0.6
+matplotlib>=3.5
+
+# Download helpers in rvc/lib/tools/.
+requests>=2.28
+tqdm>=4.64
+beautifulsoup4>=4.11
+pycryptodome>=3.17   # for the mega downloader
+
+# Optional: AMD GPU support through OpenCL.
+# Install separately if you are running on an AMD GPU on Linux/Windows.
+# pytorch-ocl>=0.0.5

@@ -2,13 +2,13 @@ import os
 import sys
 import torch
 
-from torch.nn.utils import remove_weight_norm
 from torch.nn.utils.parametrizations import weight_norm
 
 sys.path.append(os.getcwd())
 
 from .modules import WaveNet
 from .commons import get_padding, init_weights
+from rvc.lib.algo._weight_norm_compat import remove_weight_norm
 
 
 LRELU_SLOPE = 0.1
@@ -101,7 +101,7 @@ class ResidualCouplingBlock(torch.nn.Module):
     def __prepare_scriptable__(self):
         for i in range(self.n_flows):
             for hook in self.flows[i * 2]._forward_pre_hooks.values():
-                if (hook.__module__ == "torch.nn.utils.parametrizations.weight_norm" and hook.__class__.__name__ == "WeightNorm"): torch.nn.utils.remove_weight_norm(self.flows[i * 2])
+                if (hook.__module__ == "torch.nn.utils.parametrizations.weight_norm" and hook.__class__.__name__ == "WeightNorm"): remove_weight_norm(self.flows[i * 2])
 
         return self
 
