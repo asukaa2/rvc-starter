@@ -2,11 +2,9 @@ import os
 import sys
 import math
 import torch
-
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-
 from torch import einsum
 from functools import partial
 from librosa.filters import mel
@@ -16,7 +14,7 @@ from torch.nn.utils.parametrizations import weight_norm
 
 sys.path.append(os.getcwd())
 
-from rvc.lib import opencl
+from rvc import opencl
 
 os.environ["LRU_CACHE_CAPACITY"] = "3"
 
