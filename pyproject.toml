@@ -31,9 +31,14 @@ dependencies = [
 
 [project.optional-dependencies]
 opencl = ["pytorch-ocl>=0.0.5"]
+webui = ["gradio>=5.0"]
 
 [project.scripts]
 rvc-infer = "rvc.cli:main"
+rvc-webui = "app:main"
+
+[tool.setuptools]
+py-modules = ["app"]
 
 [tool.setuptools.packages.find]
-include = ["rvc*"]
+include = ["rvc*", "tabs*", "child*"]

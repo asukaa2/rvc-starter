@@ -120,6 +120,48 @@ infer_main(
 
 ---
 
+## Web UI (Gradio)
+
+For point-and-click usage, the project ships a Gradio app under `app.py`.
+The UI is split into reusable components (`child/`) and tab builders
+(`tabs/`); each tab exposes a `nametabs()` function returning
+`(tab_name, builder_fn)` so `app.py` can mount every tab with a single loop.
+
+```bash
+python app.py
+# Launches http://127.0.0.1:7860
+```
+
+Layout:
+
+```
+app.py                 # entry: mounts every tab via nametabs() and launches
+tabs/
+├── inference_tab.py   # nametabs() -> ("Inference", build_inference_tab)
+└── download_models.py  # nametabs() -> ("Download models", build_download_tab)
+child/                  # reusable Gradio components
+├── audio_io.py         # input / output audio components
+├── model_picker.py     # .pth / .index dropdowns + scan_models_dir()
+├── f0_controls.py      # f0_method, pitch, autotune sliders + dropdowns
+├── conversion_settings.py  # index_rate, protect, embedder, export_format, ...
+├── advanced_settings.py    # split_audio, clean_audio, half / cpu toggles
+└── status.py          # status textbox + progress bar
+```
+
+Add a new tab by dropping a `tabs/<name>.py` that defines:
+
+```python
+def nametabs():
+    return "Tab name", build_tab
+
+def build_tab():
+    ...
+```
+
+…and registering it in `app.py`'s `TABS` list.  No other wiring needed.
+
+---
+
 ## Project layout
 
 ```
@@ -160,36 +202,6 @@ rvc/
     ├── noisereduce.py       # built-in spectral-gating noise reducer
     └── utils/
         └── rms.py           # RMS energy extractor
-```
-
----
-
-## What was fixed
-
-The original repo was a work-in-progress.  This fork fills in every missing
-piece and repairs every runtime error so the package imports cleanly and the
-CLI works end-to-end.  Specifically:
-
-| # | File | Problem | Fix |
-|---|------|---------|-----|
-| 1 | all packages | missing `__init__.py` files | created them |
-| 2 | `rvc/config.py` | imported by `infer.py` but didn't exist | implemented `Config` with device auto-detection + `device_config()` |
-| 3 | `rvc/modules/cut.py` | imported by `infer.py` but didn't exist | implemented `cut()` / `restore()` using `librosa.effects.split` + chunk-aware zero-padding |
-| 4 | `rvc/modules/noisereduce.py` | imported (as `modules.noisereduce`) by `infer.py` but didn't exist | implemented a self-contained spectral-gating `reduce_noise()` |
-| 5 | `rvc/lib/algo/generators/mrf_hifigan.py` | imported by `synthesizers.py` but didn't exist | implemented a working `HiFiGANMRFGenerator` mirroring the NSF variant |
-| 6 | `rvc/infer/pipeline.py` | three broken imports (`predictor` vs `predictors`, `lib.modules.utils.rms` vs `modules.utils.rms`, deleted `lib.modules.my_utils`) | rewired to the correct paths |
-| 7 | `rvc/infer/infer.py` | `from modules.noisereduce ...` (bare `modules`) | fixed to `from rvc.modules.noisereduce ...` |
-| 8 | `rvc/lib/algo/generators/hifigan.py` | (a) wrong import paths, (b) `forward()` was nested inside `__init__` | fixed imports; un-nested `forward` to be a class method |
-| 9 | `rvc/lib/algo/generators/nsf_hifigan.py` | wrong import paths | rewired to `rvc.lib.algo.commons` / `residuals` |
-| 10 | `rvc/lib/algo/generators/refinegan.py` | (a) hardcoded `nn.Conv1d(256, …)` for the conditioning input, (b) `block.remove_weight_norm()` called on plain `Conv1d` | use `gin_channels`; use the function-form `remove_weight_norm(block)` |
-| 11 | `rvc/lib/predictors/crepe.py` | `cents.new_tensor(numpy_array)` — `new_tensor` rejects numpy arrays in modern PyTorch | convert numpy → torch tensor explicitly before adding |
-| 12 | repo root | no `requirements.txt`, no `README`, no `pyproject.toml`, no CLI | added all four |
-
-After the fixes, the whole package imports cleanly:
-
-```bash
-python -c "from rvc.infer.infer import infer_main; print('ok')"
-# ok
 ```
 
 ---

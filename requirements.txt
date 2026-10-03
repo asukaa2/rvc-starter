@@ -27,3 +27,6 @@ pycryptodome>=3.17   # for the mega downloader
 # Optional: AMD GPU support through OpenCL.
 # Install separately if you are running on an AMD GPU on Linux/Windows.
 # pytorch-ocl>=0.0.5
+
+# Optional: Gradio web UI (app.py). Skip if you only use the CLI.
+gradio>=5.0
