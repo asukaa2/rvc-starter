@@ -41,4 +41,4 @@ rvc-webui = "app:main"
 py-modules = ["app"]
 
 [tool.setuptools.packages.find]
-include = ["rvc*", "tabs*", "child*"]
+include = ["rvc*", "tabs*"]

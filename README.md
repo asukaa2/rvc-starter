@@ -135,17 +135,17 @@ python app.py
 Layout:
 
 ```
-app.py                 # entry: mounts every tab via nametabs() and launches
+app.py                  # entry: mounts every tab via nametabs() and launches
 tabs/
-├── inference_tab.py   # nametabs() -> ("Inference", build_inference_tab)
-└── download_models.py  # nametabs() -> ("Download models", build_download_tab)
-child/                  # reusable Gradio components
-├── audio_io.py         # input / output audio components
-├── model_picker.py     # .pth / .index dropdowns + scan_models_dir()
-├── f0_controls.py      # f0_method, pitch, autotune sliders + dropdowns
-├── conversion_settings.py  # index_rate, protect, embedder, export_format, ...
-├── advanced_settings.py    # split_audio, clean_audio, half / cpu toggles
-└── status.py          # status textbox + progress bar
+├── inference_tab.py    # nametabs() -> ("Inference", build_inference_tab)
+├── download_models.py  # nametabs() -> ("Download models", build_download_tab)
+└── child/              # reusable Gradio components (lives inside tabs/)
+    ├── audio_io.py         # input / output audio components
+    ├── model_picker.py     # .pth / .index dropdowns + scan_models_dir()
+    ├── f0_controls.py      # f0_method, pitch, autotune sliders + dropdowns
+    ├── conversion_settings.py  # index_rate, protect, embedder, export_format, ...
+    ├── advanced_settings.py    # split_audio, clean_audio, half / cpu toggles
+    └── status.py          # status textbox + progress bar
 ```
 
 Add a new tab by dropping a `tabs/<name>.py` that defines:

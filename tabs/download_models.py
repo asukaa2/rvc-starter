@@ -17,8 +17,8 @@ if _REPO not in sys.path:
 
 import gradio as gr
 
-from child.model_picker import MODELS_DIR, scan_models_dir
-from child.status import status_box
+from tabs.child.model_picker import MODELS_DIR, scan_models_dir
+from tabs.child.status import status_box
 
 # Lazily imported so the tab loads without torch / faiss / etc being
 # installed — the bridge functions will raise a friendly error if the

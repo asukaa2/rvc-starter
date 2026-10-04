@@ -18,14 +18,14 @@ if _REPO not in sys.path:
 
 import gradio as gr
 
-from child.audio_io import audio_in, audio_out
-from child.model_picker import (
+from tabs.child.audio_io import audio_in, audio_out
+from tabs.child.model_picker import (
     index_picker,
     model_picker,
     refresh_button,
     scan_models_dir,
 )
-from child.f0_controls import (
+from tabs.child.f0_controls import (
     autotune_checkbox,
     autotune_strength_slider,
     f0_method_dropdown,
@@ -33,7 +33,7 @@ from child.f0_controls import (
     hop_length_slider,
     pitch_slider,
 )
-from child.conversion_settings import (
+from tabs.child.conversion_settings import (
     embedder_dropdown,
     export_format_dropdown,
     index_rate_slider,
@@ -41,14 +41,14 @@ from child.conversion_settings import (
     resample_sr_dropdown,
     volume_envelope_slider,
 )
-from child.advanced_settings import (
+from tabs.child.advanced_settings import (
     clean_audio_checkbox,
     clean_strength_slider,
     cpu_mode_checkbox,
     half_precision_checkbox,
     split_audio_checkbox,
 )
-from child.status import status_box
+from tabs.child.status import status_box
 
 # Imported lazily inside the bridge function so the tab loads even before
 # the rvc package's heavy deps (torch, faiss, ...) are installed; that
