@@ -54,13 +54,6 @@ def nametabs():
 
 def build_download_tab():
     """Mount the download-models tab UI inside the current ``gr.Tab`` context."""
-    gr.Markdown(
-        "## Download pretrained embedders & pitch extractors\n"
-        "Files are pulled from the project's HuggingFace mirror and cached "
-        f"under `{MODELS_DIR}/`. Use this tab once before running your first "
-        "inference to avoid the long first-run download."
-    )
-
     with gr.Row():
         with gr.Column(scale=1):
             with gr.Accordion("Hubert embedders", open=True):

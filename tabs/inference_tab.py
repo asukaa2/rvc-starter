@@ -65,12 +65,6 @@ def nametabs():
 
 def build_inference_tab():
     """Mount the inference tab UI inside the current ``gr.Tab`` context."""
-    gr.Markdown(
-        "## Voice Conversion\n"
-        "Upload an audio file, pick a trained `.pth` model, tweak f0 / retrieval "
-        "settings, and click **Convert**."
-    )
-
     # ----- Top row: input + output audio -----
     with gr.Row(equal_height=True):
         with gr.Column(scale=1):
