@@ -31,6 +31,14 @@ def HF_download_file(url, output_path=None):
     response = requests.get(url, stream=True, timeout=300)
 
     if response.status_code == 200:
+        # Ensure the parent directory exists before opening — `models/` may
+        # not have been created yet on a fresh checkout / new notebook cwd,
+        # and `os.path.isdir(output_path)` returns False for a missing dir,
+        # so we'd otherwise hit FileNotFoundError: 'models/rmvpe.pt'.
+        parent = os.path.dirname(os.path.abspath(output_path))
+        if parent and not os.path.isdir(parent):
+            os.makedirs(parent, exist_ok=True)
+
         with open(output_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=10 * 1024 * 1024):
                 f.write(chunk)
